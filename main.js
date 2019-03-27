@@ -1,3 +1,5 @@
 var taskSystem = require('./utils/taskSystem');
 
-exports.taskSystem = taskSystem;
+export default {
+    taskSystem
+};
