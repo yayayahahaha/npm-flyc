@@ -1,3 +1,3 @@
 var taskSystem = require('./utils/taskSystem');
 
-module.exports.taskSystem = taskSystem;
+module.exports.TaskSystem = taskSystem;
