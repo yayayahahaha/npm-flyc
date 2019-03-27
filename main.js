@@ -1,3 +1,3 @@
-exports.flycMatoi = function() {
-	console.log('matoi ryuko rocks!');
-}
+var taskSystem = require('./utils/taskSystem');
+
+exports.taskSystem = taskSystem;
