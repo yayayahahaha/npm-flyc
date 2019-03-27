@@ -228,3 +228,5 @@ function TaskSystem(
         })
     }
 }
+
+module.exports = TaskSystem;
