@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 function download(url, filePath, {
     headers = {},
     callback = Function.prototype,
