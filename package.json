@@ -10,5 +10,8 @@
     "npm-flyc"
   ],
   "author": "flyc",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0"
+  }
 }
