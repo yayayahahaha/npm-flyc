@@ -1,4 +1,5 @@
-function download(url, filePath, headers = {}, {
+function download(url, filePath, {
+    headers = {},
     callback = Function.prototype,
     callbackParameter = undefined
 } = {}) {
