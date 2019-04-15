@@ -1,4 +1,8 @@
-function download(url, filePath, headers = {}, {
+var fs = require('fs');
+var axios = require('axios');
+
+function download(url, filePath, {
+    headers = {},
     callback = Function.prototype,
     callbackParameter = undefined
 } = {}) {
