@@ -1,6 +1,6 @@
 // TODO:
 // 1. 當前的這個taskSystem 執行的時候是mute 的還是verbose 的
-// 2. refect 的時候的 retry? 像是把 reject 的項目放到task 的後面之類的
+// 2. refect 的時候的 retry? 像是把 reject 的項目放到task 的後面之類的, 然後還要計次
 // 3. 區分警告訊息與正規訊息
 // 4. log: 記錄中間失敗的過程、產生一個 hash 記錄每次的執行狀況等
 
@@ -15,7 +15,7 @@ async function test() {
   const result = await task.doPromise()
   console.log(result)
 }
-true && test()
+false && test()
 
 function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
   // // 任務列表, 會是一個 function array
@@ -33,7 +33,7 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
     eachCallback: Function.prototype,
     callback: Function.prototype,
     retry: false,
-    maxRetry: 3
+    maxRetry: 3 // TODO 尚未實作
   }
   this.setting = Object.assign({}, defaultSetting, setting)
 
