@@ -10,7 +10,7 @@ function download(
 ) {
   return new Promise((resolve, reject) => {
     // 濾掉尾巴的斜線和開頭的./
-    const filePath = rowFilePath.replace(/^\./, '').replace(/\/$/, '')
+    const filePath = rowFilePath.replace(/^\.\//, '').replace(/\/$/, '')
 
     // 如果資料夾不存在會自動創建的系統
     const paths = filePath.split('/')
