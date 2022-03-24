@@ -1,5 +1,6 @@
 // TODO:
-// 當前的這個taskSystem 執行的時候是mute 的還是verbose 的
+// 1. 當前的這個taskSystem 執行的時候是mute 的還是verbose 的
+// 2. refect 的時候的 retry? 像是把 reject 的項目放到task 的後面之類的
 
 const isPositiveInt = number => /^[1-9]\d*$/.test(number)
 
