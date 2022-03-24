@@ -1,15 +1,17 @@
 // TODO:
 // 1. 當前的這個taskSystem 執行的時候是mute 的還是verbose 的
 // 2. refect 的時候的 retry? 像是把 reject 的項目放到task 的後面之類的
+// 3. 區分警告訊息與正規訊息
 
 const isPositiveInt = number => /^[1-9]\d*$/.test(number)
 
+const taskSample = (ok = true, delay = 300) => new Promise((r, j) => setTimeout(ok ? r : j, delay))
 function test() {
-  const taskList = [f => f]
-  const task = new TaskSystem(taskList, 1, {})
+  const taskList = [taskSample]
+  const task = new TaskSystem(taskList, 1, { retry: true })
   task.doPromise()
 }
-false && test()
+true && test()
 
 function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
   // // 任務列表, 會是一個 function array
@@ -25,7 +27,9 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
   const defaultSetting = {
     randomDelay: 2000,
     eachCallback: Function.prototype,
-    callback: Function.prototype
+    callback: Function.prototype,
+    retry: false,
+    maxRetry: 3
   }
   this.setting = Object.assign({}, defaultSetting, setting)
 
@@ -55,6 +59,16 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
         if (typeof this.eachCallback !== 'function') {
           console.log(`eachCallback 僅能為function, 將使用 ${defaultSetting[settingKey]}`, this.setting[settingKey])
           this.eachCallback = defaultSetting[settingKey]
+        }
+        break
+      case 'retry':
+        this.retry = this.setting[settingKey] // Boolean 所以都可以
+        break
+      case 'maxRetry':
+        this.maxRetry = this.setting[settingKey]
+        if (!isPositiveInt(this.maxRetry)) {
+          console.log(`maxRetry 僅可為正整數! 將使用 ${defaultSetting[settingKey]}`, this.setting[settingKey])
+          this.maxRetry = defaultSetting[settingKey]
         }
         break
 
