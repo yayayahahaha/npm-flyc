@@ -6,10 +6,11 @@
 const isPositiveInt = number => /^[1-9]\d*$/.test(number)
 
 const taskSample = (ok = true, delay = 300) => new Promise((r, j) => setTimeout(ok ? r : j, delay))
-function test() {
+async function test() {
   const taskList = [taskSample]
   const task = new TaskSystem(taskList, 1, { retry: true })
-  task.doPromise()
+  const result = await task.doPromise()
+  console.log(result)
 }
 true && test()
 
@@ -62,9 +63,6 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
 }
 
 async function _doJobs(resolveOfDoPromise) {
-  let job = null
-  let jobReault = null
-
   // 佇列裡已無工作的時候
   if (this.jobsArray.length === 0) {
     this.workingTasksNumber--
@@ -81,29 +79,18 @@ async function _doJobs(resolveOfDoPromise) {
   }
 
   // 從任務列表裡取出任務
-  job = this.jobsArray.splice(0, 1)[0]
+  const job = this.jobsArray.splice(0, 1)[0]
+  const meta = job
 
   // 判斷取出的任務是function 還是純粹的值
   // 如果是值，這裡目前沒做Object 或Array 的深度複製
-  jobReault = typeof job === 'function' ? job() : job
+  let jobReault = typeof job === 'function' ? job() : job
 
   // 這裡的catch 得要外面的Promise 用throw 丟值過來才會被觸發
   // 有點小麻煩就是了
   jobReault = await Promise.resolve(jobReault)
-    .then(result => {
-      return {
-        status: 1,
-        data: result,
-        meta: job
-      }
-    })
-    .catch(error => {
-      return {
-        status: 0,
-        data: error,
-        meta: job
-      }
-    })
+    .then(data => ({ status: 1, data, meta }))
+    .catch(data => ({ status: 0, data, meta }))
 
   this.finishedJobs++
 
