@@ -34,7 +34,7 @@ function TaskSystem(
       case 'randomDelay':
         this.randomDelay = this.setting[settingKey]
         if (!isPositiveInt(setting[settingKey])) {
-          console.log(`randomDelay 僅可為正整數, 將使用 ${this.setting[settingKey]}`)
+          console.log(`randomDelay 僅可為正整數, 將使用 ${this.setting[settingKey]}`, setting[settingKey])
         } else {
           this.randomDelay = Number(setting[settingKey])
         }
@@ -44,7 +44,7 @@ function TaskSystem(
       case 'callback':
         this.callback = this.setting[settingKey]
         if (typeof setting[settingKey] !== 'function') {
-          console.log(`callback 僅能為function, 將使用 ${this.setting[settingKey]} `)
+          console.log(`callback 僅能為function, 將使用 ${this.setting[settingKey]} `, setting[settingKey])
         } else {
           this.callback = setting[settingKey]
         }
@@ -54,7 +54,7 @@ function TaskSystem(
       case 'eachCallback':
         this.eachCallback = this.setting[settingKey]
         if (typeof setting[settingKey] !== 'function') {
-          console.log(`eachCallback 僅能為function, 將使用 ${this.setting[settingKey]}`)
+          console.log(`eachCallback 僅能為function, 將使用 ${this.setting[settingKey]}`, setting[settingKey])
         } else {
           this.eachCallback = setting[settingKey]
         }
