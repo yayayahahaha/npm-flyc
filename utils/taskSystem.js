@@ -4,15 +4,14 @@
 
 const isPositiveInt = number => /^[1-9]\d*$/.test(number)
 
-function TaskSystem(
-  jobsArray = [],
-  taskNumber = 5,
-  setting = {
-    eachCallback: Function.prototype,
-    callback: Function.prototype,
-    randomDelay: 2000
-  }
-) {
+function test() {
+  const taskList = [f => f]
+  const task = new TaskSystem(taskList, 1, {})
+  task.doPromise()
+}
+false && test()
+
+function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
   // // 任務列表, 會是一個 function array
   this.jobsArray = []
   if (!Array.isArray(jobsArray)) console.log('jobsArray 僅接受 Array, 將使用空陣列')
@@ -23,40 +22,39 @@ function TaskSystem(
   if (!isPositiveInt(taskNumber)) console.log('taskNumber 僅可為正整數, 將使用 5')
   else this.taskNumber = taskNumber
 
-  this.setting = {
+  const defaultSetting = {
     randomDelay: 2000,
     eachCallback: Function.prototype,
     callback: Function.prototype
   }
-  Object.keys(setting).forEach(settingKey => {
+  this.setting = Object.assign({}, defaultSetting, setting)
+
+  Object.keys(defaultSetting).forEach(settingKey => {
     switch (settingKey) {
       // 隨機延遲，用於假裝人性化
       case 'randomDelay':
         this.randomDelay = this.setting[settingKey]
-        if (!isPositiveInt(setting[settingKey])) {
-          console.log(`randomDelay 僅可為正整數, 將使用 ${this.setting[settingKey]}`, setting[settingKey])
-        } else {
-          this.randomDelay = Number(setting[settingKey])
+        if (isNaN(this.randomDelay)) {
+          console.log(`randomDelay 僅可為數字, 將使用 ${defaultSetting[settingKey]}`, this.setting[settingKey])
+          this.randomDelay = defaultSetting[settingKey]
         }
         break
 
       // 任務完成後的callback
       case 'callback':
         this.callback = this.setting[settingKey]
-        if (typeof setting[settingKey] !== 'function') {
-          console.log(`callback 僅能為function, 將使用 ${this.setting[settingKey]} `, setting[settingKey])
-        } else {
-          this.callback = setting[settingKey]
+        if (typeof this.callback !== 'function') {
+          console.log(`callback 僅能為function, 將使用 ${defaultSetting[settingKey]} `, this.setting[settingKey])
+          this.callback = defaultSetting[settingKey]
         }
         break
 
       // 每一次task做完後的callback
       case 'eachCallback':
         this.eachCallback = this.setting[settingKey]
-        if (typeof setting[settingKey] !== 'function') {
-          console.log(`eachCallback 僅能為function, 將使用 ${this.setting[settingKey]}`, setting[settingKey])
-        } else {
-          this.eachCallback = setting[settingKey]
+        if (typeof this.eachCallback !== 'function') {
+          console.log(`eachCallback 僅能為function, 將使用 ${defaultSetting[settingKey]}`, this.setting[settingKey])
+          this.eachCallback = defaultSetting[settingKey]
         }
         break
 
