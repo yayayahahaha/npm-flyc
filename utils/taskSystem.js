@@ -33,8 +33,8 @@ function TaskSystem(
       // 隨機延遲，用於假裝人性化
       case 'randomDelay':
         this.randomDelay = this.setting[settingKey]
-        if (!isPositiveInt(setting[settingKey])) {
-          console.log(`randomDelay 僅可為正整數, 將使用 ${this.setting[settingKey]}`, setting[settingKey])
+        if (isNaN(setting[settingKey])) {
+          console.log(`randomDelay 僅可為數字, 將使用 ${this.setting[settingKey]}`, setting[settingKey])
         } else {
           this.randomDelay = Number(setting[settingKey])
         }
