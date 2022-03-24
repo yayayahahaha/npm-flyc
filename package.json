@@ -1,6 +1,6 @@
 {
   "name": "npm-flyc",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "a testing project about npm package",
   "main": "main.js",
   "scripts": {
