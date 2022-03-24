@@ -38,7 +38,6 @@ function download(
         file.on('finish', () => resolve(true))
       })
       .catch(error => {
-        console.log(error)
         callback(false, callbackParameter)
         reject([null, error])
       })
