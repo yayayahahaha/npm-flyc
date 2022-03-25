@@ -3,6 +3,7 @@
 // 2. refect 的時候的 retry? 像是把 reject 的項目放到task 的後面之類的, 然後還要計次
 // 3. 區分警告訊息與正規訊息
 // 4. log: 記錄中間失敗的過程、產生一個 hash 記錄每次的執行狀況等
+// 5. 調整檢查參數那邊的 code 變得更優雅一些
 
 const isPositiveInt = number => /^[1-9]\d*$/.test(number)
 
