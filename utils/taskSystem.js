@@ -3,17 +3,28 @@
 // 2. refect 的時候的 retry? 像是把 reject 的項目放到task 的後面之類的, 然後還要計次
 // 3. 區分警告訊息與正規訊息
 // 4. log: 記錄中間失敗的過程、產生一個 hash 記錄每次的執行狀況等
+// 5. 調整檢查參數那邊的 code 變得更優雅一些
 
 const isPositiveInt = number => /^[1-9]\d*$/.test(number)
 
-const taskSample = (ok = true, delay = 300) => {
-  return () => new Promise((r, j) => setTimeout(ok ? r : j, delay))
+const taskSample = (delay = 300) => {
+  return () => new Promise(r => setTimeout(r, delay))
+}
+const tempFailed = () => {
+  let number = 3
+  return () =>
+    new Promise((resolve, reject) => {
+      number--
+      if (number > 0) return reject()
+      return resolve()
+    })
 }
 async function test() {
-  const taskList = [taskSample(true), taskSample(false)]
+  const taskList = [tempFailed(), taskSample(true)]
   const task = new TaskSystem(taskList, 1, { retry: true, randomDelay: 0 })
   const result = await task.doPromise()
-  console.log(result)
+
+  console.log('result:', result)
 }
 false && test()
 
@@ -96,8 +107,8 @@ async function _doJobs(resolveOfDoPromise) {
     .catch(data => ({ status: 0, data, meta }))
 
   if (!jobReault.status && this.retry) {
+    console.log('')
     console.log('job 失敗! 將重新嘗試')
-    this.workingTasksNumber++
     this.totalJobsNumber++
     this.jobsArray.push(job)
   }
