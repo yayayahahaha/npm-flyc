@@ -21,7 +21,13 @@ const tempFailed = () => {
 }
 async function test() {
   const taskList = [tempFailed(), taskSample(true)]
-  const task = new TaskSystem(taskList, 1, { retry: true, randomDelay: 0 })
+  const task = new TaskSystem(taskList, 1, {
+    randomDelay: 2000, // 隨機延遲，用於假裝人性化
+    eachCallback: f => f, // 任務完成後的callback
+    callback: a => a, // 每一次task做完後的callback
+    retry: false, // task 失敗的話是否重試
+    maxRetry: 123 // TODO 最大可重試次數
+  })
   const result = await task.doPromise()
 
   console.log('result:', result)
@@ -40,11 +46,11 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
   else this.taskNumber = taskNumber
 
   const defaultSetting = {
-    randomDelay: 2000,
-    eachCallback: Function.prototype,
-    callback: Function.prototype,
-    retry: false,
-    maxRetry: 3 // TODO 尚未實作
+    randomDelay: 2000, // 隨機延遲，用於假裝人性化
+    eachCallback: Function.prototype, // 任務完成後的callback
+    callback: Function.prototype, // 每一次task做完後的callback
+    retry: false, // task 失敗的話是否重試
+    maxRetry: 3 // TODO 最大可重試次數
   }
   this.setting = Object.assign({}, defaultSetting, setting)
 
@@ -124,49 +130,37 @@ async function _doJobs(resolveOfDoPromise) {
 }
 
 function _checkParams(defaultSetting) {
-  Object.keys(defaultSetting).forEach(settingKey => {
-    switch (settingKey) {
-      // 隨機延遲，用於假裝人性化
-      case 'randomDelay':
-        this.randomDelay = this.setting[settingKey]
-        if (isNaN(this.randomDelay)) {
-          console.log(`randomDelay 僅可為數字, 將使用 ${defaultSetting[settingKey]}`, this.setting[settingKey])
-          this.randomDelay = defaultSetting[settingKey]
-        }
-        break
-
-      // 任務完成後的callback
-      case 'callback':
-        this.callback = this.setting[settingKey]
-        if (typeof this.callback !== 'function') {
-          console.log(`callback 僅能為function, 將使用 ${defaultSetting[settingKey]} `, this.setting[settingKey])
-          this.callback = defaultSetting[settingKey]
-        }
-        break
-
-      // 每一次task做完後的callback
-      case 'eachCallback':
-        this.eachCallback = this.setting[settingKey]
-        if (typeof this.eachCallback !== 'function') {
-          console.log(`eachCallback 僅能為function, 將使用 ${defaultSetting[settingKey]}`, this.setting[settingKey])
-          this.eachCallback = defaultSetting[settingKey]
-        }
-        break
-      case 'retry':
-        this.retry = this.setting[settingKey] // Boolean 所以都可以
-        break
-      case 'maxRetry':
-        this.maxRetry = this.setting[settingKey]
-        if (!isPositiveInt(this.maxRetry)) {
-          console.log(`maxRetry 僅可為正整數! 將使用 ${defaultSetting[settingKey]}`, this.setting[settingKey])
-          this.maxRetry = defaultSetting[settingKey]
-        }
-        break
-
-      default:
-        console.log(`無法識別的setting 參數: ${settingKey}`)
-        break
+  const keyMap = {
+    retry: {
+      type: Boolean,
+      pass: () => true
+    },
+    maxRetry: {
+      type: '正整數',
+      pass: value => isPositiveInt(value)
+    },
+    randomDelay: {
+      type: '數字',
+      pass: value => !isNaN(value)
+    },
+    callback: {
+      type: '函式',
+      pass: value => typeof value === 'function'
+    },
+    eachCallback: {
+      type: '函式',
+      pass: value => typeof value === 'function'
     }
+  }
+
+  Object.keys(defaultSetting).forEach(settingKey => {
+    const { pass, type } = keyMap[settingKey]
+    this[settingKey] = this.setting[settingKey]
+
+    if (pass(this[settingKey])) return
+    this[settingKey] = defaultSetting[settingKey]
+
+    console.log(`${settingKey} 僅能為${type}, 將使用 ${defaultSetting[settingKey]}`, this.setting[settingKey])
   })
 }
 
