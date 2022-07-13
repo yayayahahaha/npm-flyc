@@ -2,6 +2,8 @@ const fs = require('fs')
 const axios = require('axios')
 
 // TODO 避免單純使用 headers, 要傳入整個 axios condif 做 assign 之類的
+// TODO 直接不使用 axios、使用 fetch ?
+// TODO 如果資料夾不存在的話就創建的那個系統其實有內建..
 
 function download(
   url,
