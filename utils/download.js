@@ -30,7 +30,7 @@ function download(
       method: 'get',
       url,
       responseType: 'stream',
-      headers
+      headers,
     }
     axios(axiosSetting)
       .then(({ data /* 這個是 axios 的 data */ }) => {
@@ -39,7 +39,7 @@ function download(
 
         file.on('finish', () => resolve(true))
       })
-      .catch(error => {
+      .catch((error) => {
         callback(false, callbackParameter)
         reject([null, error])
       })

@@ -5,10 +5,10 @@
 // 4. log: 記錄中間失敗的過程、產生一個 hash 記錄每次的執行狀況等
 // 5. 調整檢查參數那邊的 code 變得更優雅一些
 
-const isPositiveInt = number => /^[1-9]\d*$/.test(number)
+const isPositiveInt = (number) => /^[1-9]\d*$/.test(number)
 
 const taskSample = (delay = 300) => {
-  return () => new Promise(r => setTimeout(r, delay))
+  return () => new Promise((r) => setTimeout(r, delay))
 }
 const tempFailed = () => {
   let number = 3
@@ -23,10 +23,10 @@ async function test() {
   const taskList = [tempFailed(), taskSample(true)]
   const task = new TaskSystem(taskList, 1, {
     randomDelay: 2000, // 隨機延遲，用於假裝人性化
-    eachCallback: f => f, // 任務完成後的callback
-    callback: a => a, // 每一次task做完後的callback
+    eachCallback: (f) => f, // 任務完成後的callback
+    callback: (a) => a, // 每一次task做完後的callback
     retry: false, // task 失敗的話是否重試
-    maxRetry: 123 // TODO 最大可重試次數
+    maxRetry: 123, // TODO 最大可重試次數
   })
   const result = await task.doPromise()
 
@@ -50,7 +50,7 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
     eachCallback: Function.prototype, // 任務完成後的callback
     callback: Function.prototype, // 每一次task做完後的callback
     retry: false, // task 失敗的話是否重試
-    maxRetry: 3 // TODO 最大可重試次數
+    maxRetry: 3, // TODO 最大可重試次數
   }
   this.setting = Object.assign({}, defaultSetting, setting)
 
@@ -63,7 +63,7 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
   this.finishedJobs = 0 // 完成的任務數量
 
   this.doPromise = () => {
-    return new Promise(resolveOfDoPromise => {
+    return new Promise((resolveOfDoPromise) => {
       if (this.jobsArray.length === 0) {
         console.log('warning: 傳入的jobs 陣列為空')
         resolveOfDoPromise(this.resultArray)
@@ -109,8 +109,8 @@ async function _doJobs(resolveOfDoPromise) {
   // 這裡的catch 得要外面的Promise 用throw 丟值過來才會被觸發
   // 有點小麻煩就是了
   jobReault = await Promise.resolve(jobReault)
-    .then(data => ({ status: 1, data, meta }))
-    .catch(data => ({ status: 0, data, meta }))
+    .then((data) => ({ status: 1, data, meta }))
+    .catch((data) => ({ status: 0, data, meta }))
 
   if (!jobReault.status && this.retry) {
     console.log('')
@@ -133,27 +133,27 @@ function _checkParams(defaultSetting) {
   const keyMap = {
     retry: {
       type: Boolean,
-      pass: () => true
+      pass: () => true,
     },
     maxRetry: {
       type: '正整數',
-      pass: value => isPositiveInt(value)
+      pass: (value) => isPositiveInt(value),
     },
     randomDelay: {
       type: '數字',
-      pass: value => !isNaN(value)
+      pass: (value) => !isNaN(value),
     },
     callback: {
       type: '函式',
-      pass: value => typeof value === 'function'
+      pass: (value) => typeof value === 'function',
     },
     eachCallback: {
       type: '函式',
-      pass: value => typeof value === 'function'
-    }
+      pass: (value) => typeof value === 'function',
+    },
   }
 
-  Object.keys(defaultSetting).forEach(settingKey => {
+  Object.keys(defaultSetting).forEach((settingKey) => {
     const { pass, type } = keyMap[settingKey]
     this[settingKey] = this.setting[settingKey]
 
