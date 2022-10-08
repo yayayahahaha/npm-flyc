@@ -19,6 +19,7 @@ const tempFailed = () => {
       return resolve()
     })
 }
+
 async function test() {
   const taskList = [tempFailed(), taskSample(true)]
   const task = new TaskSystem(taskList, 1, {
