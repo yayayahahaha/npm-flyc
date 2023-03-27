@@ -186,6 +186,20 @@ async function test() {
 }
 false && test()
 
+/**
+ * @typedef TaskSystemSetting
+ * @property {number} randomDelay - 隨機延遲，用於假裝人性化
+ * @property {function} eachCallback - 任務完成後的callback
+ * @property {function} callback - 每一次task做完後的callback
+ * @property {number} retry - task 失敗的話是否重試
+ * @property {number} maxRetry - TODO 最大可重試次數
+ * */
+/**
+ * @function TaskSystem
+ * @param {Array<function>} jobsArray
+ * @param {number} taskNumber - this is some description
+ * @param {TaskSystemSetting} TaskSystemSetting
+ * */
 function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
   // // 任務列表, 會是一個 function array
   this.jobsArray = []
