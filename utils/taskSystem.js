@@ -291,7 +291,7 @@ async function _doJobs(resolveOfDoPromise) {
   const meta = job
 
   // 判斷取出的任務是function 還是純粹的值
-  // 如果是值，這裡目前沒做Object 或Array 的深度複製
+  // TODO 如果是值，這裡目前沒做Object 或Array 的深度複製
   let jobReault = typeof job === 'function' ? job() : job
 
   // 這裡的catch 得要外面的Promise 用throw 丟值過來才會被觸發
@@ -306,14 +306,12 @@ async function _doJobs(resolveOfDoPromise) {
     this.totalJobsNumber++
     this.jobsArray.push(job)
 
-    // TODO 加一筆總數
+    // 設定 progressbar 的 total
     this.progressbar.setTotal(this.totalJobsNumber)
   }
 
   this.finishedJobs++
   this.progressbar.increment()
-
-  // _showOutput.call(this, jobReault)
 
   this.eachCallback(jobReault)
   this.resultArray.push(jobReault)
