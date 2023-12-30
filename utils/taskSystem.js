@@ -113,12 +113,15 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
   this.workingTasksNumber = 0 // 當前還沒結束的task 數量
   this.totalJobsNumber = this.jobsArray.length // 總任務數量
   this.finishedJobs = 0 // 完成的任務數量
-  this.progressbar = new cliProgress.SingleBar({
-    format: 'Progress {percentage}% {bar} {value}/{total}',
-    barCompleteChar: '\u2588',
-    barIncompleteChar: '\u2591',
-    // hideCursor: true,
+  this.progressbar = new cliProgress.MultiBar({
+    clearOnComplete: false,
+    hideCursor: true,
+    barCompleteChar: '\u2588', // TODO 不知道可不可以作用
+    barIncompleteChar: '\u2591', // TODO 不知道可不可以作用
+    format: '{jobname} {bar} {percentage}% {value}/{total}',
   }) // 進度條
+  this.mainProgressbar = this.progressbar.create(this.totalJobsNumber, 0) // 主進度條
+  this.mainProgressbar.update(0, { jobname: 'TODO put jobname here' })
 
   this.doPromise = () => {
     // TODO 這裡會有互相遮蓋的問題，看要怎麼處理會比較好看
@@ -140,8 +143,6 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
       )
 
       this.workingTasksNumber = this.taskNumber
-
-      this.progressbar.start(this.totalJobsNumber)
 
       for (var i = 0; i < this.taskNumber; i++) {
         _doJobs.call(this, resolveOfDoPromise)
@@ -188,11 +189,11 @@ async function _doJobs(resolveOfDoPromise) {
     this.jobsArray.push(job)
 
     // 設定 progressbar 的 total
-    this.progressbar.setTotal(this.totalJobsNumber)
+    this.mainProgressbar.setTotal(this.totalJobsNumber)
   }
 
   this.finishedJobs++
-  this.progressbar.increment()
+  this.mainProgressbar.increment()
 
   this.eachCallback(jobReault)
   this.resultArray.push(jobReault)
