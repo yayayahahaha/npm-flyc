@@ -146,8 +146,9 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
     barIncompleteChar: '\u2591', // TODO 不知道可不可以作用
     format: '{jobname} {bar} {percentage}% {value}/{total}',
   }) // 進度條
-  this.mainProgressbar = this.progressbar.create(this.totalJobsNumber, 0) // 主進度條
-  this.mainProgressbar.update(0, { jobname: 'TODO put jobname here' })
+  // TODO 這個 mainProgressbar 會讓 terminal 無法結束，先註解掉相關的東西
+  // this.mainProgressbar = this.progressbar.create(this.totalJobsNumber, 0) // 主進度條
+  // this.mainProgressbar.update(0, { jobname: 'TODO put jobname here' })
 
   this.subProgressbarMap = {}
 
@@ -225,11 +226,11 @@ async function _doJobs(resolveOfDoPromise) {
     this.jobsArray.push(job)
 
     // 設定 progressbar 的 total
-    this.mainProgressbar.setTotal(this.totalJobsNumber)
+    // this.mainProgressbar.setTotal(this.totalJobsNumber)
   }
 
   this.finishedJobs++
-  this.mainProgressbar.increment()
+  // this.mainProgressbar.increment()
 
   this.eachCallback(jobReault)
   this.resultArray.push(jobReault)
