@@ -41,6 +41,8 @@
 }
 */
 const cliProgress = require('cli-progress')
+const uuid = require('uuid')
+const uuidV4 = uuid.v4
 
 const isPositiveInt = (number) => /^[1-9]\d*$/.test(number)
 
@@ -71,6 +73,30 @@ async function test() {
   console.log('result:', result)
 }
 false && test()
+
+/**
+ * @function Job
+ * @property {string} jobName - job name, display before progressbar.
+ * @property {any} job - job function, usually return a promise.
+ * @property {number} [progressValue] - current finished value for progressbar.
+ * @property {number} [progressTotal] - total value of progressbar.
+ * @property {function} updateProgress
+ * @property {function} setTotalProgress
+ * */
+function Job(config) {
+  if (config == null) {
+    console.error(`[Job] config should be an object.`)
+    return null
+  }
+
+  const { jobName, job } = config
+  Object.assign(this, { jobName, job, jobId: uuidV4() })
+  return this
+}
+Job.prototype.updateProgress = function () {
+  console.log('jobId:', this.jobId)
+}
+Job.prototype.setTotalProgress = function () {}
 
 /**
  * @typedef TaskSystemSetting
@@ -114,7 +140,7 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
   this.totalJobsNumber = this.jobsArray.length // 總任務數量
   this.finishedJobs = 0 // 完成的任務數量
   this.progressbar = new cliProgress.MultiBar({
-    clearOnComplete: false,
+    clearOnComplete: true,
     hideCursor: true,
     barCompleteChar: '\u2588', // TODO 不知道可不可以作用
     barIncompleteChar: '\u2591', // TODO 不知道可不可以作用
@@ -122,6 +148,8 @@ function TaskSystem(jobsArray = [], taskNumber = 5, setting = {}) {
   }) // 進度條
   this.mainProgressbar = this.progressbar.create(this.totalJobsNumber, 0) // 主進度條
   this.mainProgressbar.update(0, { jobname: 'TODO put jobname here' })
+
+  this.subProgressbarMap = {}
 
   this.doPromise = () => {
     // TODO 這裡會有互相遮蓋的問題，看要怎麼處理會比較好看
@@ -174,7 +202,15 @@ async function _doJobs(resolveOfDoPromise) {
 
   // 判斷取出的任務是function 還是純粹的值
   // TODO 如果是值，這裡目前沒做Object 或Array 的深度複製
-  let jobReault = typeof job === 'function' ? job() : job
+  let jobReault = null
+  if (typeof job === 'function') {
+    jobReault = job()
+  } else if (job instanceof Job) {
+    jobReault = job.job()
+    // TODO 處理 progress 的 mapping 問題
+  } else {
+    jobReault = job
+  }
 
   // 這裡的catch 得要外面的Promise 用throw 丟值過來才會被觸發
   // 有點小麻煩就是了
@@ -242,4 +278,5 @@ function _checkParams(defaultSetting) {
   })
 }
 
+TaskSystem.Job = Job
 module.exports = TaskSystem
