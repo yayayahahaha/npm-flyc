@@ -7,6 +7,8 @@
 // 5. 調整檢查參數那邊的 code 變得更優雅一些
 // 6. 用套件處理 progress 的部分, 後續再透過參數決定要不要顯示
 // 7. 每一個 job 如果可以有自己的 callback 的話, 看可不可以顯示巢狀的任務進度表? (e.g. download progress)
+// 8. 如果傳入的是某個寫好的 instance, 加上像是 name, progress, total 什麼的話，應該也可以弄成巢狀的 progressbar?
+// -> 在這種條件下，如果沒有傳這個 instance 的話，應該也可以做? 但 subprogress 就會是直接從 0% 跳成 100% 這樣
 
 /*
 需求
@@ -41,127 +43,6 @@
 const cliProgress = require('cli-progress')
 
 const isPositiveInt = (number) => /^[1-9]\d*$/.test(number)
-
-function MasterHouseWorker(config) {
-  return this
-}
-function MasterHouse(config = {}) {
-  const usingConfig = _defaultCheck(new.target, config)
-  if (!usingConfig) return null
-
-  const {
-    mute,
-    log,
-    basicDelay,
-    randomDelay,
-    eachCallback,
-    callback,
-    maxRetry,
-    pickRandomly,
-    workerNumber,
-  } = usingConfig
-
-  const workers = [...Array(workerNumber)].map(() => MasterHouseWorker(usingConfig))
-
-  return this
-}
-MasterHouse.prototype.start = function () {}
-MasterHouse.prototype.addJobs = function (jobs) {
-  if (!Array.isArray(jobs)) {
-    console.error('[MasterHouse] addJobs: jobs shold be an array.')
-    return false
-  }
-}
-
-// new MasterHouse({ mute: false, workerNumber: 1.1 })
-
-function _defaultCheck(newTarget, config) {
-  if (newTarget === undefined) {
-    console.error('[MasterHouse] Please use new operator to create an instance of MasterHouse')
-    return null
-  }
-  if (Array.isArray(config) || typeof config !== 'object' || !config) {
-    console.error('[MasterHouse] config must be an object')
-    return null
-  }
-
-  const configKeys = Object.keys(config)
-
-  const usingConfig = {}
-  const defaultParams = {
-    mute: {
-      default: false,
-      validator: (f) => true,
-    },
-    log: {
-      default: true,
-      validator: (f) => true,
-    },
-    basicDelay: {
-      default: 0,
-      validator: (value) => value >= 0,
-      errorMessage: 'basicDelay can only be equal or bigger than 0',
-    },
-    randomDelay: {
-      default: 0,
-      validator: (value) => value >= 0,
-      errorMessage: 'randomDelay can only be equal or bigger than 0',
-    },
-    eachCallback: {
-      default: (f) => f,
-      validator: (f) => true,
-    },
-    callback: {
-      default: (f) => f,
-      validator: (f) => true,
-    },
-    maxRetry: {
-      default: 0,
-      validator: (value) => value >= 0,
-      errorMessage: 'maxRetry can only be equal or bigger than 0',
-    },
-    pickRandomly: {
-      default: false,
-      validator: (f) => true,
-    },
-    workerNumber: {
-      default: 10,
-      validator: isPositiveInt,
-      errorMessage: 'workerNumber can only be positive integer',
-    },
-  }
-
-  Object.keys(defaultParams).forEach((key) => {
-    const configIndex = configKeys.findIndex((item) => item === key)
-    if (~configIndex) configKeys.splice(configIndex, 1)
-
-    const { default: defaultValue, validator, errorMessage = '' } = defaultParams[key]
-    const defaultType = typeof defaultValue
-
-    if (config[key] === undefined) {
-      usingConfig[key] = defaultValue
-      return
-    }
-
-    if (typeof config[key] !== defaultType) {
-      console.warn(
-        `[MasterHouse] typeof config "${key}" can only be ${defaultType}. will use default value: ${defaultValue}`
-      )
-    } else {
-      if (!validator(usingConfig[key])) {
-        console.log(`[MasterHouse] ${errorMessage}. will use default value: ${defaultValue}`)
-        return
-      }
-
-      usingConfig[key] = config[key]
-    }
-  })
-
-  if (configKeys.length)
-    console.warn(`[MasterHouse] there are extra config keys: ${JSON.stringify(configKeys)} `)
-
-  return usingConfig
-}
 
 const taskSample = (delay = 300) => {
   return () => new Promise((r) => setTimeout(r, delay))
