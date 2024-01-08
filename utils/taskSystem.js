@@ -89,8 +89,12 @@ function Job(config) {
     return null
   }
 
-  const { jobName, job } = config
-  Object.assign(this, { jobName, job, jobId: uuidV4() })
+  let { jobName, job, payload } = config
+  const jobId = uuidV4()
+  if (jobName == null) jobName = jobId
+  if (job == null) job = null
+  if (payload == null) payload = null
+  Object.assign(this, { jobName, job, payload, jobId })
   return this
 }
 Job.prototype.updateProgress = function () {
@@ -207,7 +211,7 @@ async function _doJobs(resolveOfDoPromise) {
   if (typeof job === 'function') {
     jobReault = job()
   } else if (job instanceof Job) {
-    jobReault = job.job()
+    jobReault = job.job(job.payload)
     // TODO 處理 progress 的 mapping 問題
   } else {
     jobReault = job
