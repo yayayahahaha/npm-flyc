@@ -5,6 +5,18 @@ const axios = require('axios')
 // TODO 直接不使用 axios、使用 fetch ?
 // TODO 如果資料夾不存在的話就創建的那個系統其實有內建..
 
+/**
+ * @typedef DownloadSetting
+ * @property {object} headers
+ * @property {function} callback
+ * @property {any} callbackParameter
+ * */
+/**
+ * @function download
+ * @param {string} url
+ * @param {string} rowFilePath
+ * @param {DownloadSetting} DownloadSetting
+ * */
 function download(
   url,
   rowFilePath,
@@ -30,7 +42,7 @@ function download(
       method: 'get',
       url,
       responseType: 'stream',
-      headers
+      headers,
     }
     axios(axiosSetting)
       .then(({ data /* 這個是 axios 的 data */ }) => {
@@ -39,7 +51,7 @@ function download(
 
         file.on('finish', () => resolve(true))
       })
-      .catch(error => {
+      .catch((error) => {
         callback(false, callbackParameter)
         reject([null, error])
       })
