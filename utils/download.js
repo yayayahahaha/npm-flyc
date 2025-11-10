@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const { Readable } = require('stream')
 
 /**
  * @typedef DownloadSetting
@@ -39,7 +40,9 @@ function download(
 
         callback(true, callbackParameter)
 
-        res.body.pipe(file)
+        const nodeStream = Readable.fromWeb(res.body)
+
+        nodeStream.pipe(file)
 
         file.on('finish', () => resolve(true));
 
@@ -48,7 +51,7 @@ function download(
           reject([null, err])
         })
 
-        res.body.on('error', (err) => {
+        nodeStream.on('error', (err) => {
           callback(false, callbackParameter)
           reject([null, err])
         })
